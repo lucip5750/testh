@@ -3,7 +3,7 @@ const { open } = require('lmdb');
 const path = require('path');
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 // Cache configuration
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes in milliseconds
@@ -79,7 +79,10 @@ function cleanupCache() {
 }
 
 // Run cache cleanup every minute
-setInterval(cleanupCache, 60 * 1000);
+let cleanupInterval;
+if (process.env.NODE_ENV !== 'test') {
+    cleanupInterval = setInterval(cleanupCache, 60 * 1000);
+}
 
 app.get('/entries', async (req, res) => {
     const requestStartTime = process.hrtime();
@@ -87,7 +90,6 @@ app.get('/entries', async (req, res) => {
         // Set headers for JSON streaming
         res.setHeader('Content-Type', 'application/json');
         res.write('['); // Start JSON array
-        console.log('Response started');
 
         // Get entries from cache or database
         const entries = await getAllEntries();
@@ -117,7 +119,9 @@ app.get('/entries', async (req, res) => {
             // If we can't write (back-pressure), wait for drain
             if (!canWrite) {
                 await new Promise(resolve => {
-                    res.once('drain', resolve);
+                    res.once('drain', () => {
+                        resolve();
+                    });
                 });
             }
         }
@@ -156,7 +160,32 @@ app.get('/cache-stats', (req, res) => {
     res.json(stats);
 });
 
-// Start the server
-app.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}`);
-}); 
+// Create and start server
+function createServer(port = process.env.PORT || 3000) {
+    return new Promise((resolve, reject) => {
+        const server = app.listen(port, () => {
+            console.log(`Server running at http://localhost:${port}`);
+            resolve(server);
+        }).on('error', (err) => {
+            if (err.code === 'EADDRINUSE') {
+                // Try the next port
+                createServer(port + 1).then(resolve).catch(reject);
+            } else {
+                reject(err);
+            }
+        });
+    });
+}
+
+// Only start the server if this file is run directly
+if (require.main === module) {
+    createServer().catch(console.error);
+}
+
+// Export for testing
+module.exports = {
+    app,
+    createServer,
+    cleanupCache,
+    cleanupInterval
+}; 
