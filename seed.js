@@ -43,8 +43,8 @@ function generateMockData() {
     const mockData = [];
     const now = new Date();
 
-    // Generate 300 users
-    for (let i = 1; i <= 300; i++) {
+    // Generate 3000 users
+    for (let i = 1; i <= 3000; i++) {
         mockData.push({
             key: `user:${i}`,
             value: {
@@ -58,45 +58,62 @@ function generateMockData() {
                     newsletter: Math.random() > 0.5,
                     theme: Math.random() > 0.5 ? 'dark' : 'light',
                     language: Math.random() > 0.5 ? 'en' : 'es'
-                }
+                },
+                address: {
+                    street: `${Math.floor(Math.random() * 1000) + 1} ${['Main', 'Oak', 'Pine', 'Maple', 'Cedar'][Math.floor(Math.random() * 5)]} St`,
+                    city: ['New York', 'Los Angeles', 'Chicago', 'Houston', 'Phoenix', 'Philadelphia', 'San Antonio', 'San Diego', 'Dallas', 'San Jose'][Math.floor(Math.random() * 10)],
+                    state: ['NY', 'CA', 'IL', 'TX', 'AZ', 'PA', 'FL', 'OH', 'GA', 'NC'][Math.floor(Math.random() * 10)],
+                    zipCode: `${Math.floor(Math.random() * 90000) + 10000}`
+                },
+                phone: `+1${Math.floor(Math.random() * 900000000) + 1000000000}`,
+                loyaltyPoints: Math.floor(Math.random() * 1000)
             }
         });
     }
 
-    // Generate 400 products
-    for (let i = 1; i <= 400; i++) {
+    // Generate 4000 products
+    for (let i = 1; i <= 4000; i++) {
         const product = data.products[Math.floor(Math.random() * data.products.length)];
         const price = (product.basePrice * (0.8 + Math.random() * 0.4)).toFixed(2);
+        const category = product.category;
+        const subcategory = ['Premium', 'Standard', 'Basic', 'Limited Edition', 'Seasonal'][Math.floor(Math.random() * 5)];
+        
         mockData.push({
             key: `product:${i}`,
             value: {
-                name: `${product.name} ${i}`,
+                name: `${subcategory} ${product.name} ${i}`,
                 price: price,
                 stock: Math.floor(Math.random() * 100),
-                category: product.category,
+                category: category,
+                subcategory: subcategory,
                 rating: (Math.random() * 5).toFixed(1),
                 reviews: Math.floor(Math.random() * 1000),
                 inStock: Math.random() > 0.2,
                 description: `High-quality ${product.name.toLowerCase()} with amazing features`,
                 specifications: {
-                    color: ['Black', 'White', 'Silver', 'Gold'][Math.floor(Math.random() * 4)],
+                    color: ['Black', 'White', 'Silver', 'Gold', 'Blue', 'Red', 'Green'][Math.floor(Math.random() * 7)],
                     weight: `${Math.floor(Math.random() * 5) + 1}kg`,
-                    dimensions: `${Math.floor(Math.random() * 50) + 10}x${Math.floor(Math.random() * 30) + 5}x${Math.floor(Math.random() * 20) + 2}cm`
+                    dimensions: `${Math.floor(Math.random() * 50) + 10}x${Math.floor(Math.random() * 30) + 5}x${Math.floor(Math.random() * 20) + 2}cm`,
+                    material: ['Metal', 'Plastic', 'Wood', 'Glass', 'Ceramic'][Math.floor(Math.random() * 5)],
+                    warranty: `${Math.floor(Math.random() * 3) + 1} year${Math.floor(Math.random() * 3) + 1 > 1 ? 's' : ''}`
                 },
-                tags: ['new', 'popular', 'bestseller'].filter(() => Math.random() > 0.5)
+                tags: ['new', 'popular', 'bestseller', 'sale', 'featured'].filter(() => Math.random() > 0.5),
+                sku: `SKU${Math.floor(Math.random() * 1000000)}`,
+                supplier: `Supplier ${Math.floor(Math.random() * 100) + 1}`,
+                lastRestock: new Date(now - Math.random() * 30 * 86400000).toISOString()
             }
         });
     }
 
-    // Generate 250 orders
-    for (let i = 1; i <= 250; i++) {
-        const userId = Math.floor(Math.random() * 300) + 1;
+    // Generate 2500 orders
+    for (let i = 1; i <= 2500; i++) {
+        const userId = Math.floor(Math.random() * 3000) + 1;
         const numProducts = Math.floor(Math.random() * 5) + 1;
         const products = [];
         let total = 0;
 
         for (let j = 0; j < numProducts; j++) {
-            const productId = Math.floor(Math.random() * 400) + 1;
+            const productId = Math.floor(Math.random() * 4000) + 1;
             const quantity = Math.floor(Math.random() * 3) + 1;
             products.push({
                 productId: `product:${productId}`,
@@ -110,43 +127,50 @@ function generateMockData() {
         }
 
         const orderDate = new Date(now - Math.random() * 10000000000);
+        const status = ['pending', 'completed', 'cancelled', 'shipped', 'delivered', 'returned'][Math.floor(Math.random() * 6)];
         mockData.push({
             key: `order:${i}`,
             value: {
                 userId: `user:${userId}`,
                 products: products,
                 total: total.toFixed(2),
-                status: ['pending', 'completed', 'cancelled', 'shipped'][Math.floor(Math.random() * 4)],
+                status: status,
                 paymentMethod: data.paymentMethods[Math.floor(Math.random() * data.paymentMethods.length)],
                 createdAt: orderDate.toISOString(),
                 shippingAddress: {
-                    street: `${Math.floor(Math.random() * 1000) + 1} Main St`,
-                    city: ['New York', 'Los Angeles', 'Chicago', 'Houston', 'Phoenix'][Math.floor(Math.random() * 5)],
-                    state: ['NY', 'CA', 'IL', 'TX', 'AZ'][Math.floor(Math.random() * 5)],
+                    street: `${Math.floor(Math.random() * 1000) + 1} ${['Main', 'Oak', 'Pine', 'Maple', 'Cedar'][Math.floor(Math.random() * 5)]} St`,
+                    city: ['New York', 'Los Angeles', 'Chicago', 'Houston', 'Phoenix', 'Philadelphia', 'San Antonio', 'San Diego', 'Dallas', 'San Jose'][Math.floor(Math.random() * 10)],
+                    state: ['NY', 'CA', 'IL', 'TX', 'AZ', 'PA', 'FL', 'OH', 'GA', 'NC'][Math.floor(Math.random() * 10)],
                     zipCode: `${Math.floor(Math.random() * 90000) + 10000}`
                 },
                 trackingNumber: `TRK${Math.floor(Math.random() * 1000000)}`,
-                estimatedDelivery: new Date(orderDate.getTime() + 7 * 86400000).toISOString()
+                estimatedDelivery: new Date(orderDate.getTime() + 7 * 86400000).toISOString(),
+                actualDelivery: status === 'delivered' ? new Date(orderDate.getTime() + (5 + Math.random() * 5) * 86400000).toISOString() : null,
+                notes: Math.random() > 0.7 ? 'Special handling required' : null,
+                discount: Math.random() > 0.8 ? (Math.random() * 20).toFixed(2) : '0.00',
+                tax: (total * 0.08).toFixed(2)
             }
         });
     }
 
-    // Generate 30 settings entries
-    for (let i = 1; i <= 30; i++) {
+    // Generate 300 settings entries
+    for (let i = 1; i <= 300; i++) {
         mockData.push({
             key: `settings:${i}`,
             value: {
                 name: `Setting ${i}`,
                 value: Math.random() > 0.5,
                 lastModified: new Date(now - Math.random() * 10000000000).toISOString(),
-                modifiedBy: `user:${Math.floor(Math.random() * 300) + 1}`,
-                category: ['system', 'user', 'security', 'notification'][Math.floor(Math.random() * 4)]
+                modifiedBy: `user:${Math.floor(Math.random() * 3000) + 1}`,
+                category: ['system', 'user', 'security', 'notification', 'payment', 'shipping', 'inventory', 'marketing'][Math.floor(Math.random() * 8)],
+                description: `Configuration setting for ${['system', 'user', 'security', 'notification', 'payment', 'shipping', 'inventory', 'marketing'][Math.floor(Math.random() * 8)]} module`,
+                version: `${Math.floor(Math.random() * 5) + 1}.${Math.floor(Math.random() * 10)}.${Math.floor(Math.random() * 10)}`
             }
         });
     }
 
-    // Generate 20 stats entries
-    for (let i = 1; i <= 20; i++) {
+    // Generate 200 stats entries
+    for (let i = 1; i <= 200; i++) {
         const date = new Date(now - i * 86400000);
         mockData.push({
             key: `stats:daily:${i}`,
@@ -155,12 +179,17 @@ function generateMockData() {
                 visitors: Math.floor(Math.random() * 5000) + 1000,
                 sales: Math.floor(Math.random() * 100) + 10,
                 revenue: (Math.random() * 10000).toFixed(2),
-                topProducts: Array.from({length: 5}, (_, i) => `product:${Math.floor(Math.random() * 400) + 1}`),
+                topProducts: Array.from({length: 5}, (_, i) => `product:${Math.floor(Math.random() * 4000) + 1}`),
                 averageOrderValue: (Math.random() * 200).toFixed(2),
                 newUsers: Math.floor(Math.random() * 50),
                 activeUsers: Math.floor(Math.random() * 200) + 100,
                 conversionRate: (Math.random() * 5).toFixed(2),
-                peakHour: Math.floor(Math.random() * 24)
+                peakHour: Math.floor(Math.random() * 24),
+                bounceRate: (Math.random() * 30).toFixed(2),
+                averageSessionDuration: Math.floor(Math.random() * 1800) + 300,
+                mobileUsers: Math.floor(Math.random() * 70) + 30,
+                returningCustomers: Math.floor(Math.random() * 40) + 10,
+                cartAbandonmentRate: (Math.random() * 20).toFixed(2)
             }
         });
     }
