@@ -87,15 +87,14 @@ app.get('/entries', async (req, res) => {
         // Set headers for JSON streaming
         res.setHeader('Content-Type', 'application/json');
         res.write('['); // Start JSON array
+        console.log('Response started');
 
         // Get entries from cache or database
         const entries = await getAllEntries();
         
         // Handle client disconnect
         req.on('close', () => {
-            if (isResponseWritable(res)) {
-                res.end();
-            }
+            res.end();
         });
 
         // Process entries with back-pressure handling
