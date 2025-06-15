@@ -14,8 +14,8 @@ This project is a simple NodeJS HTTP server that streams all entries from an LMD
 
 1. **Clone the repository**
    ```sh
-   git clone <your-repo-url>
-   cd <project-directory>
+   git clone https://github.com/lucip5750/testh.git
+   cd testh
    ```
 
 2. **Install dependencies**
