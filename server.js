@@ -145,7 +145,7 @@ app.get('/entries', async (req, res) => {
 });
 
 // Add a route to manually clear the cache
-app.post('/clear-cache', (req, res) => {
+app.get('/clear-cache', (req, res) => {
     cache.clear();
     res.json({ message: 'Cache cleared successfully' });
 });

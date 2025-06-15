@@ -1,15 +1,13 @@
 const request = require('supertest');
-const express = require('express');
-const { open } = require('lmdb');
 const path = require('path');
 const fs = require('fs');
 const http = require('http');
 
 // Import the server code
-const { app, createServer } = require('./server');
+const { app, createServer } = require('../server');
 
 // Test database path
-const TEST_DB_PATH = path.join(__dirname, 'test-data');
+const TEST_DB_PATH = path.join(__dirname, '.', 'test-data');
 
 // Helper function to clear test database
 function clearTestDatabase() {
@@ -105,10 +103,10 @@ describe('Server Integration Tests', () => {
         });
     });
 
-    describe('POST /clear-cache', () => {
+    describe('GET /clear-cache', () => {
         it('should clear the cache successfully', async () => {
             const response = await request(app)
-                .post('/clear-cache')
+                .get('/clear-cache')
                 .expect('Content-Type', /json/)
                 .expect(200);
 

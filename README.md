@@ -52,7 +52,7 @@ This project is a simple NodeJS HTTP server that streams all entries from an LMD
       "ttl": 300000
     }
     ```
-- `POST /clear-cache` - Manually clear the cache
+- `GET /clear-cache` - Manually clear the cache
   - Returns success message when cache is cleared
   - Example response:
     ```json
@@ -84,16 +84,31 @@ Request completed in 30.12ms
 - `server.js` — Main HTTP server with caching implementation
 - `seed.js` — Script to populate the LMDB store with mock data
 - `data/` — LMDB database files (auto-created)
+- `__tests__/` — Test directory containing all test files
+  - `server.test.js` — Integration tests for server endpoints and cache functionality
+
+## Testing
+
+The project includes a comprehensive test suite to ensure reliability and functionality:
+
+1. **Run all tests**
+   ```sh
+   npm test
+   ```
+
+Test files are located in the `__tests__` directory and follow the Jest testing framework conventions. The test suite is organized as follows:
+
+- `__tests__/server.test.js`: Contains all server-related tests including:
+  - API endpoint testing
+  - Cache functionality verification
+  - Error handling scenarios
+  - Client disconnection handling
+  - Cache statistics and clearing
 
 ## Notes
 - `node_modules` is excluded from git via `.gitignore`.
 - To add more mock data, edit `seed.js` and re-run it.
 - Cache TTL is set to 5 minutes by default
-- Cache is automatically cleaned up every minute
 
 ## Requirements
 - Node.js 16 or higher
-
----
-
-Feel free to modify and extend this project as needed! 
