@@ -135,19 +135,6 @@ const entryValidation = [
     validateRequest
 ];
 
-const cacheValidation = [
-    query('key')
-        .optional()
-        .isString()
-        .withMessage('Cache key must be a string')
-        .trim()
-        .notEmpty()
-        .withMessage('Cache key must be a non-empty string')
-        .matches(/^[a-zA-Z_][a-zA-Z0-9_]*$/)
-        .withMessage('Cache key must start with a letter or underscore and contain only letters, numbers, and underscores'),
-    validateRequest
-];
-
 // Apply validation to routes
 app.get('/entries', entryValidation, async (req, res) => {
     const requestStartTime = process.hrtime();
