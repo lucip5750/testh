@@ -2,9 +2,22 @@ const express = require('express');
 const { open } = require('lmdb');
 const path = require('path');
 const rateLimit = require('express-rate-limit');
+const cors = require('cors');
 
 const app = express();
 const port = process.env.PORT || 3000;
+
+// CORS configuration
+const corsOptions = {
+    origin: process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : ['http://localhost:3000'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true,
+    maxAge: 86400 // 24 hours
+};
+
+// Apply CORS middleware
+app.use(cors(corsOptions));
 
 // Rate limiting configuration
 const limiter = rateLimit({

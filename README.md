@@ -135,3 +135,37 @@ If a client exceeds the rate limit, they will receive a response like this:
 ### Testing
 
 Rate limiting is tested in the test suite. See `__tests__/server.test.js` for details.
+
+## CORS Configuration
+
+This server implements CORS (Cross-Origin Resource Sharing) to control which domains can access the API. The CORS configuration is as follows:
+
+- **Allowed Origins:** Configurable via `ALLOWED_ORIGINS` environment variable (comma-separated list) or defaults to `['http://localhost:3000']`
+- **Allowed Methods:** GET, POST, PUT, DELETE, OPTIONS
+- **Allowed Headers:** Content-Type, Authorization
+- **Credentials:** Allowed (for authenticated requests)
+- **Max Age:** 24 hours (86400 seconds) for preflight requests
+
+### Environment Variables
+
+To configure allowed origins, set the `ALLOWED_ORIGINS` environment variable:
+
+```bash
+ALLOWED_ORIGINS=https://example.com,https://api.example.com
+```
+
+### Example
+
+A successful CORS request will include the following headers:
+
+```
+Access-Control-Allow-Origin: http://localhost:3000
+Access-Control-Allow-Credentials: true
+Access-Control-Allow-Methods: GET,POST,PUT,DELETE,OPTIONS
+Access-Control-Allow-Headers: Content-Type,Authorization
+Access-Control-Max-Age: 86400
+```
+
+### Testing
+
+CORS functionality is tested in the test suite. See `__tests__/server.test.js` for details.

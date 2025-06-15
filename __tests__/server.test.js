@@ -228,4 +228,45 @@ describe('Server Integration Tests', () => {
             expect(remainingAfter).toBeGreaterThan(remainingBefore);
         });
     });
+
+    describe('CORS', () => {
+        it('should allow requests from allowed origins', async () => {
+            const response = await request(app)
+                .get('/entries')
+                .set('Origin', 'http://localhost:3000')
+                .expect(200);
+
+            expect(response.headers['access-control-allow-origin']).toBe('http://localhost:3000');
+            expect(response.headers['access-control-allow-credentials']).toBe('true');
+        });
+
+        it('should allow specified HTTP methods', async () => {
+            const response = await request(app)
+                .options('/entries')
+                .set('Origin', 'http://localhost:3000')
+                .expect(204);
+
+            expect(response.headers['access-control-allow-methods'])
+                .toContain('GET,POST,PUT,DELETE,OPTIONS');
+        });
+
+        it('should allow specified headers', async () => {
+            const response = await request(app)
+                .options('/entries')
+                .set('Origin', 'http://localhost:3000')
+                .expect(204);
+
+            expect(response.headers['access-control-allow-headers'])
+                .toContain('Content-Type,Authorization');
+        });
+
+        it('should set max age for preflight requests', async () => {
+            const response = await request(app)
+                .options('/entries')
+                .set('Origin', 'http://localhost:3000')
+                .expect(204);
+
+            expect(response.headers['access-control-max-age']).toBe('86400');
+        });
+    });
 }); 
