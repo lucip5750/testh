@@ -129,14 +129,25 @@ const validateRequest = (req, res, next) => {
 };
 
 // Validation schemas
-const entryValidation = [
-    query('limit').optional().isInt({ min: 1, max: 100 }).withMessage('Limit must be between 1 and 100'),
-    query('offset').optional().isInt({ min: 0 }).withMessage('Offset must be a positive number'),
+const entriesValidation = [
+    query('limit')
+        .optional()
+        .isInt({ min: 1, max: 100 })
+        .withMessage('Limit must be between 1 and 100')
+        .toInt()
+        .escape(),
+    query('offset')
+        .optional()
+        .isInt({ min: 0 })
+        .withMessage('Offset must be a non-negative number')
+        .toInt()
+        .escape(),
+    query('*').escape(),
     validateRequest
 ];
 
 // Apply validation to routes
-app.get('/entries', entryValidation, async (req, res) => {
+app.get('/entries', entriesValidation, async (req, res) => {
     const requestStartTime = process.hrtime();
     try {
         // Set headers for JSON streaming

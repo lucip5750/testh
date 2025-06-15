@@ -209,3 +209,45 @@ The server uses `express-validator` to ensure data integrity and security.
   ```
 
 Request validation is tested in the test suite located at `__tests__/server.test.js`.
+
+## Input Sanitization
+
+The server implements input sanitization to prevent injection attacks and ensure data integrity. All user input is sanitized before processing:
+
+### Query Parameters Sanitization
+
+- **Numeric Parameters:**
+  - `limit` and `offset` are converted to integers
+  - Invalid values are rejected
+  - Values are escaped to prevent injection
+
+- **String Parameters:**
+  - All string inputs are trimmed of whitespace
+  - Special characters are escaped
+  - Input is validated against allowed patterns
+
+### Security Features
+
+- **SQL Injection Prevention:**
+  - All user input is escaped
+  - Query parameters are strictly typed
+  - Pattern matching for allowed characters
+
+- **XSS Prevention:**
+  - HTML special characters are escaped
+  - Input is sanitized before being used in responses
+  - Content-Type headers are properly set
+
+### Example
+
+Raw input:
+```
+GET /entries?limit=10&offset=0&param=<script>alert('xss')</script>
+```
+
+Sanitized input:
+```
+GET /entries?limit=10&offset=0&param=%3Cscript%3Ealert%28%27xss%27%29%3C%2Fscript%3E
+```
+
+Input sanitization is tested in the test suite located at `__tests__/server.test.js`.

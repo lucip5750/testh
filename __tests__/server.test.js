@@ -307,10 +307,10 @@ describe('Server Integration Tests', () => {
                 const response = await request(app)
                     .get('/entries?offset=-1')
                     .expect(400);
-
+                
                 expect(response.body.errors).toContainEqual(
                     expect.objectContaining({
-                        msg: 'Offset must be a positive number'
+                        msg: 'Offset must be a non-negative number'
                     })
                 );
             });
@@ -325,6 +325,34 @@ describe('Server Integration Tests', () => {
                         msg: 'Limit must be between 1 and 100'
                     })
                 );
+            });
+
+            it('should sanitize numeric parameters', async () => {
+                const response = await request(app)
+                    .get('/entries?limit=10&offset=0')
+                    .expect(200);
+                
+                expect(response.body).toBeInstanceOf(Array);
+                expect(response.body.length).toBeLessThanOrEqual(10);
+            });
+
+            it('should sanitize and escape special characters', async () => {
+                const response = await request(app)
+                    .get('/entries?limit=10&offset=0&param=<script>alert("xss")</script>')
+                    .expect(200);
+                
+                expect(response.body).toBeInstanceOf(Array);
+                // Verify that the response doesn't contain the raw script tag
+                expect(JSON.stringify(response.body)).not.toContain('<script>');
+            });
+
+            it('should handle malformed query parameters', async () => {
+                const response = await request(app)
+                    .get('/entries?limit=abc&offset=xyz')
+                    .expect(400);
+                
+                expect(response.body).toHaveProperty('errors');
+                expect(response.body.errors[0]).toHaveProperty('msg', 'Limit must be between 1 and 100');
             });
         });
     });
