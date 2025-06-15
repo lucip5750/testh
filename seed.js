@@ -43,8 +43,8 @@ function generateMockData() {
     const mockData = [];
     const now = new Date();
 
-    // Generate 3000 users
-    for (let i = 1; i <= 3000; i++) {
+    // Generate 300 users
+    for (let i = 1; i <= 300; i++) {
         mockData.push({
             key: `user:${i}`,
             value: {
@@ -71,8 +71,8 @@ function generateMockData() {
         });
     }
 
-    // Generate 4000 products
-    for (let i = 1; i <= 4000; i++) {
+    // Generate 400 products
+    for (let i = 1; i <= 400; i++) {
         const product = data.products[Math.floor(Math.random() * data.products.length)];
         const price = (product.basePrice * (0.8 + Math.random() * 0.4)).toFixed(2);
         const category = product.category;
@@ -105,15 +105,15 @@ function generateMockData() {
         });
     }
 
-    // Generate 2500 orders
-    for (let i = 1; i <= 2500; i++) {
-        const userId = Math.floor(Math.random() * 3000) + 1;
+    // Generate 200 orders
+    for (let i = 1; i <= 200; i++) {
+        const userId = Math.floor(Math.random() * 300) + 1;
         const numProducts = Math.floor(Math.random() * 5) + 1;
         const products = [];
         let total = 0;
 
         for (let j = 0; j < numProducts; j++) {
-            const productId = Math.floor(Math.random() * 4000) + 1;
+            const productId = Math.floor(Math.random() * 400) + 1;
             const quantity = Math.floor(Math.random() * 3) + 1;
             products.push({
                 productId: `product:${productId}`,
@@ -153,15 +153,15 @@ function generateMockData() {
         });
     }
 
-    // Generate 300 settings entries
-    for (let i = 1; i <= 300; i++) {
+    // Generate 50 settings entries
+    for (let i = 1; i <= 50; i++) {
         mockData.push({
             key: `settings:${i}`,
             value: {
                 name: `Setting ${i}`,
                 value: Math.random() > 0.5,
                 lastModified: new Date(now - Math.random() * 10000000000).toISOString(),
-                modifiedBy: `user:${Math.floor(Math.random() * 3000) + 1}`,
+                modifiedBy: `user:${Math.floor(Math.random() * 300) + 1}`,
                 category: ['system', 'user', 'security', 'notification', 'payment', 'shipping', 'inventory', 'marketing'][Math.floor(Math.random() * 8)],
                 description: `Configuration setting for ${['system', 'user', 'security', 'notification', 'payment', 'shipping', 'inventory', 'marketing'][Math.floor(Math.random() * 8)]} module`,
                 version: `${Math.floor(Math.random() * 5) + 1}.${Math.floor(Math.random() * 10)}.${Math.floor(Math.random() * 10)}`
@@ -169,8 +169,8 @@ function generateMockData() {
         });
     }
 
-    // Generate 200 stats entries
-    for (let i = 1; i <= 200; i++) {
+    // Generate 50 stats entries
+    for (let i = 1; i <= 50; i++) {
         const date = new Date(now - i * 86400000);
         mockData.push({
             key: `stats:daily:${i}`,
@@ -179,7 +179,7 @@ function generateMockData() {
                 visitors: Math.floor(Math.random() * 5000) + 1000,
                 sales: Math.floor(Math.random() * 100) + 10,
                 revenue: (Math.random() * 10000).toFixed(2),
-                topProducts: Array.from({length: 5}, (_, i) => `product:${Math.floor(Math.random() * 4000) + 1}`),
+                topProducts: Array.from({length: 5}, (_, i) => `product:${Math.floor(Math.random() * 400) + 1}`),
                 averageOrderValue: (Math.random() * 200).toFixed(2),
                 newUsers: Math.floor(Math.random() * 50),
                 activeUsers: Math.floor(Math.random() * 200) + 100,
