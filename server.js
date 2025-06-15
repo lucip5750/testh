@@ -146,6 +146,22 @@ const entriesValidation = [
     validateRequest
 ];
 
+// API key configuration
+const API_KEY = process.env.API_KEY || 'test-api-key-123';
+
+// API key validation middleware
+const validateApiKey = (req, res, next) => {
+    const apiKey = req.headers['x-api-key'];
+    
+    if (!apiKey || apiKey !== API_KEY) {
+        return res.status(401).json({
+            error: 'Invalid or missing API key'
+        });
+    }
+    
+    next();
+};
+
 // Apply validation to routes
 app.get('/entries', entriesValidation, async (req, res) => {
     const requestStartTime = process.hrtime();
@@ -208,13 +224,13 @@ app.get('/entries', entriesValidation, async (req, res) => {
 });
 
 // Add a route to manually clear the cache
-app.get('/clear-cache', (req, res) => {
+app.get('/clear-cache', validateApiKey, (req, res) => {
     cache.clear();
     res.json({ message: 'Cache cleared successfully' });
 });
 
 // Add a route to get cache statistics
-app.get('/cache-stats', (req, res) => {
+app.get('/cache-stats', validateApiKey, (req, res) => {
     const stats = {
         size: cache.size,
         keys: Array.from(cache.keys()),

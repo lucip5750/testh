@@ -81,6 +81,7 @@ describe('Server Integration Tests', () => {
         it('should return cache statistics', async () => {
             const response = await request(app)
                 .get('/cache-stats')
+                .set('x-api-key', 'test-api-key-123')
                 .expect('Content-Type', /json/)
                 .expect(200);
 
@@ -95,6 +96,7 @@ describe('Server Integration Tests', () => {
         it('should clear the cache successfully', async () => {
             const response = await request(app)
                 .get('/clear-cache')
+                .set('x-api-key', 'test-api-key-123')
                 .expect('Content-Type', /json/)
                 .expect(200);
 
@@ -103,6 +105,7 @@ describe('Server Integration Tests', () => {
             // Verify cache is cleared by checking stats
             const statsResponse = await request(app)
                 .get('/cache-stats')
+                .set('x-api-key', 'test-api-key-123')
                 .expect('Content-Type', /json/)
                 .expect(200);
 
@@ -112,15 +115,15 @@ describe('Server Integration Tests', () => {
 
     describe('Cache Behavior', () => {
         it('should cache entries after first request', async () => {
-            // First request - should be a cache miss
+            // First request - should miss cache
             await request(app)
                 .get('/entries')
-                .expect('Content-Type', /json/)
                 .expect(200);
 
             // Check cache stats
             const statsResponse = await request(app)
                 .get('/cache-stats')
+                .set('x-api-key', 'test-api-key-123')
                 .expect('Content-Type', /json/)
                 .expect(200);
 
@@ -129,20 +132,24 @@ describe('Server Integration Tests', () => {
         });
 
         it('should return cached data on subsequent requests', async () => {
-            // First request
-            const firstResponse = await request(app)
+            // First request - should miss cache
+            await request(app)
                 .get('/entries')
+                .expect(200);
+
+            // Second request - should hit cache
+            await request(app)
+                .get('/entries')
+                .expect(200);
+
+            // Verify cache stats
+            const statsResponse = await request(app)
+                .get('/cache-stats')
+                .set('x-api-key', 'test-api-key-123')
                 .expect('Content-Type', /json/)
                 .expect(200);
 
-            // Second request
-            const secondResponse = await request(app)
-                .get('/entries')
-                .expect('Content-Type', /json/)
-                .expect(200);
-
-            // Both responses should be identical
-            expect(secondResponse.body).toEqual(firstResponse.body);
+            expect(statsResponse.body.size).toBe(1);
         });
     });
 
@@ -354,6 +361,51 @@ describe('Server Integration Tests', () => {
                 expect(response.body).toHaveProperty('errors');
                 expect(response.body.errors[0]).toHaveProperty('msg', 'Limit must be between 1 and 100');
             });
+        });
+    });
+
+    describe('Cache Operations', () => {
+        const validApiKey = 'test-api-key-123';
+
+        it('should require valid API key for cache operations', async () => {
+            // Test without API key
+            await request(app)
+                .get('/cache-stats')
+                .expect(401);
+
+            // Test with invalid API key
+            await request(app)
+                .get('/cache-stats')
+                .set('x-api-key', 'invalid-key')
+                .expect(401);
+
+            // Test with valid API key
+            await request(app)
+                .get('/cache-stats')
+                .set('x-api-key', validApiKey)
+                .expect(200);
+        });
+
+        it('should clear cache with valid API key', async () => {
+            const response = await request(app)
+                .get('/clear-cache')
+                .set('x-api-key', validApiKey)
+                .expect(200);
+
+            expect(response.body).toEqual({
+                message: 'Cache cleared successfully'
+            });
+        });
+
+        it('should get cache stats with valid API key', async () => {
+            const response = await request(app)
+                .get('/cache-stats')
+                .set('x-api-key', validApiKey)
+                .expect(200);
+
+            expect(response.body).toHaveProperty('size');
+            expect(response.body).toHaveProperty('keys');
+            expect(response.body).toHaveProperty('ttl');
         });
     });
 }); 

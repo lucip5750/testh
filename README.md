@@ -44,6 +44,7 @@ This project is a simple NodeJS HTTP server that streams all entries from an LMD
 ### Cache Management
 - `GET /cache-stats` - Get cache statistics
   - Returns information about cache size, keys, and TTL
+  - Requires valid API key in `X-API-Key` header
   - Example response:
     ```json
     {
@@ -54,12 +55,30 @@ This project is a simple NodeJS HTTP server that streams all entries from an LMD
     ```
 - `GET /clear-cache` - Manually clear the cache
   - Returns success message when cache is cleared
+  - Requires valid API key in `X-API-Key` header
   - Example response:
     ```json
     {
       "message": "Cache cleared successfully"
     }
     ```
+
+### API Key Authentication
+
+Cache management endpoints require API key authentication:
+
+- **Header:** `X-API-Key`
+- **Configuration:** Set via `API_KEY` environment variable or defaults to `test-api-key-123`
+- **Example Request:**
+  ```bash
+  curl -H "X-API-Key: your-api-key" http://localhost:3000/cache-stats
+  ```
+- **Error Response (401 Unauthorized):**
+  ```json
+  {
+    "error": "Invalid or missing API key"
+  }
+  ```
 
 ## Performance Monitoring
 
