@@ -60,7 +60,7 @@ function isResponseWritable(res) {
 }
 
 // Helper function to get all entries from cache or database
-async function getAllEntries(limit, offset) {
+async function getAllEntries(limit = 100, offset = 0) {
     const startTime = process.hrtime();
     const cacheKey = `all_entries_${limit}_${offset}`;
     const cachedEntry = cache.get(cacheKey);
@@ -76,16 +76,14 @@ async function getAllEntries(limit, offset) {
     // If no cache or expired, fetch from database
     console.log('Cache miss: fetching from database');
     const entries = [];
-    const iterator = db.getRange({});
+    const iterator = db.getRange({
+        limit,
+        offset
+    });
     let skipped = 0;
     let added = 0;
 
     for await (const entry of iterator) {
-        if (skipped < offset) {
-            skipped++;
-            continue;
-        }
-        if (limit !== undefined && added >= limit) break;
         entries.push({
             key: entry.key,
             value: entry.value

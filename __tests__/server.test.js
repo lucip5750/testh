@@ -128,7 +128,7 @@ describe('Server Integration Tests', () => {
                 .expect(200);
 
             expect(statsResponse.body.size).toBe(1);
-            expect(statsResponse.body.keys).toContain('all_entries_undefined_undefined');
+            expect(statsResponse.body.keys).toContain('all_entries_100_0');
         });
 
         it('should return cached data on subsequent requests', async () => {
