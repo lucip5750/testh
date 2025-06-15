@@ -3,6 +3,7 @@ const { open } = require('lmdb');
 const path = require('path');
 const rateLimit = require('express-rate-limit');
 const cors = require('cors');
+const { body, query, validationResult } = require('express-validator');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -59,9 +60,9 @@ function isResponseWritable(res) {
 }
 
 // Helper function to get all entries from cache or database
-async function getAllEntries() {
+async function getAllEntries(limit, offset) {
     const startTime = process.hrtime();
-    const cacheKey = 'all_entries';
+    const cacheKey = `all_entries_${limit}_${offset}`;
     const cachedEntry = cache.get(cacheKey);
 
     // Return cached data if it exists and is not expired
@@ -76,12 +77,20 @@ async function getAllEntries() {
     console.log('Cache miss: fetching from database');
     const entries = [];
     const iterator = db.getRange({});
-    
+    let skipped = 0;
+    let added = 0;
+
     for await (const entry of iterator) {
+        if (skipped < offset) {
+            skipped++;
+            continue;
+        }
+        if (limit !== undefined && added >= limit) break;
         entries.push({
             key: entry.key,
             value: entry.value
         });
+        added++;
     }
 
     // Update cache
@@ -110,7 +119,37 @@ if (process.env.NODE_ENV !== 'test') {
     cleanupInterval = setInterval(cleanupCache, 60 * 1000);
 }
 
-app.get('/entries', async (req, res) => {
+// Validation middleware
+const validateRequest = (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+    next();
+};
+
+// Validation schemas
+const entryValidation = [
+    query('limit').optional().isInt({ min: 1, max: 100 }).withMessage('Limit must be between 1 and 100'),
+    query('offset').optional().isInt({ min: 0 }).withMessage('Offset must be a positive number'),
+    validateRequest
+];
+
+const cacheValidation = [
+    query('key')
+        .optional()
+        .isString()
+        .withMessage('Cache key must be a string')
+        .trim()
+        .notEmpty()
+        .withMessage('Cache key must be a non-empty string')
+        .matches(/^[a-zA-Z_][a-zA-Z0-9_]*$/)
+        .withMessage('Cache key must start with a letter or underscore and contain only letters, numbers, and underscores'),
+    validateRequest
+];
+
+// Apply validation to routes
+app.get('/entries', entryValidation, async (req, res) => {
     const requestStartTime = process.hrtime();
     try {
         // Set headers for JSON streaming
@@ -118,7 +157,7 @@ app.get('/entries', async (req, res) => {
         res.write('['); // Start JSON array
 
         // Get entries from cache or database
-        const entries = await getAllEntries();
+        const entries = await getAllEntries(req.query.limit, req.query.offset);
         
         // Handle client disconnect
         req.on('close', () => {

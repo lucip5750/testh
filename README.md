@@ -169,3 +169,43 @@ Access-Control-Max-Age: 86400
 ### Testing
 
 CORS functionality is tested in the test suite. See `__tests__/server.test.js` for details.
+
+## Request Validation
+
+The server uses `express-validator` to ensure data integrity and security.
+
+### Entries Endpoint (`GET /entries`)
+
+- **Query Parameters:**
+  - `limit` (optional): Number of entries to return. Must be an integer between 1 and 100. Defaults to all entries.
+  - `offset` (optional): Number of entries to skip. Must be a non-negative integer. Defaults to 0.
+
+- **Example Valid Request:**
+  ```
+  GET /entries?limit=10&offset=0
+  ```
+
+- **Example Error Response:**
+  ```json
+  {
+    "errors": [
+      {
+        "msg": "Limit must be between 1 and 100",
+        "param": "limit",
+        "location": "query"
+      }
+    ]
+  }
+  ```
+
+### Cache Operations
+
+- **Query Parameters:**
+  - No query parameters required.
+
+- **Example Valid Request:**
+  ```
+  GET /clear-cache
+  ```
+
+Request validation is tested in the test suite located at `__tests__/server.test.js`.

@@ -64,6 +64,17 @@ describe('Server Integration Tests', () => {
                 expect(firstEntry).toHaveProperty('value');
             }
         });
+
+        it('should apply limit and offset correctly', async () => {
+            const response = await request(app)
+                .get('/entries?limit=2&offset=1')
+                .expect('Content-Type', /json/)
+                .expect(200);
+
+            expect(response.body.length).toBeLessThanOrEqual(2);
+            // Assuming the first entry is skipped due to offset=1
+            expect(response.body[0]).not.toEqual(expect.objectContaining({ key: 'first_key' }));
+        });
     });
 
     describe('GET /cache-stats', () => {
@@ -114,7 +125,7 @@ describe('Server Integration Tests', () => {
                 .expect(200);
 
             expect(statsResponse.body.size).toBe(1);
-            expect(statsResponse.body.keys).toContain('all_entries');
+            expect(statsResponse.body.keys).toContain('all_entries_undefined_undefined');
         });
 
         it('should return cached data on subsequent requests', async () => {
@@ -267,6 +278,54 @@ describe('Server Integration Tests', () => {
                 .expect(204);
 
             expect(response.headers['access-control-max-age']).toBe('86400');
+        });
+    });
+
+    describe('Request Validation', () => {
+        describe('GET /entries', () => {
+            it('should accept valid query parameters', async () => {
+                const response = await request(app)
+                    .get('/entries?limit=10&offset=0')
+                    .expect(200);
+
+                expect(response.status).toBe(200);
+            });
+
+            it('should reject invalid limit parameter', async () => {
+                const response = await request(app)
+                    .get('/entries?limit=invalid')
+                    .expect(400);
+
+                expect(response.body.errors).toContainEqual(
+                    expect.objectContaining({
+                        msg: 'Limit must be between 1 and 100'
+                    })
+                );
+            });
+
+            it('should reject negative offset', async () => {
+                const response = await request(app)
+                    .get('/entries?offset=-1')
+                    .expect(400);
+
+                expect(response.body.errors).toContainEqual(
+                    expect.objectContaining({
+                        msg: 'Offset must be a positive number'
+                    })
+                );
+            });
+
+            it('should reject limit greater than 100', async () => {
+                const response = await request(app)
+                    .get('/entries?limit=101')
+                    .expect(400);
+
+                expect(response.body.errors).toContainEqual(
+                    expect.objectContaining({
+                        msg: 'Limit must be between 1 and 100'
+                    })
+                );
+            });
         });
     });
 }); 
