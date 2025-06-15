@@ -112,3 +112,26 @@ Test files are located in the `__tests__` directory and follow the Jest testing 
 
 ## Requirements
 - Node.js 16 or higher
+
+## Rate Limiting
+
+This server implements rate limiting to prevent abuse. The rate limiter is configured as follows:
+
+- **Time Window:** 15 minutes
+- **Request Limit:** 100 requests per IP address within the time window
+- **Headers:** Uses legacy `X-RateLimit-*` headers
+- **Error Message:** Returns a 429 status code with the message: `{ error: 'Too many requests from this IP, please try again later.' }`
+
+### Example
+
+If a client exceeds the rate limit, they will receive a response like this:
+
+```json
+{
+  "error": "Too many requests from this IP, please try again later."
+}
+```
+
+### Testing
+
+Rate limiting is tested in the test suite. See `__tests__/server.test.js` for details.
