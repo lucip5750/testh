@@ -1,10 +1,17 @@
 const request = require('supertest');
 const path = require('path');
 const fs = require('fs');
-const http = require('http');
 
 // Import the server code
 const { app, createServer } = require('../server');
+
+// Test constants
+/**
+ * API key used for testing cache operations.
+ * Uses the same API key as the server:
+ * - If API_KEY environment variable is set, uses that value
+ */
+const TEST_API_KEY = process.env.API_KEY;
 
 // Enable fake timers
 jest.useFakeTimers();
@@ -81,7 +88,7 @@ describe('Server Integration Tests', () => {
         it('should return cache statistics', async () => {
             const response = await request(app)
                 .get('/cache-stats')
-                .set('x-api-key', 'test-api-key-123')
+                .set('x-api-key', TEST_API_KEY)
                 .expect('Content-Type', /json/)
                 .expect(200);
 
@@ -96,7 +103,7 @@ describe('Server Integration Tests', () => {
         it('should clear the cache successfully', async () => {
             const response = await request(app)
                 .get('/clear-cache')
-                .set('x-api-key', 'test-api-key-123')
+                .set('x-api-key', TEST_API_KEY)
                 .expect('Content-Type', /json/)
                 .expect(200);
 
@@ -105,7 +112,7 @@ describe('Server Integration Tests', () => {
             // Verify cache is cleared by checking stats
             const statsResponse = await request(app)
                 .get('/cache-stats')
-                .set('x-api-key', 'test-api-key-123')
+                .set('x-api-key', TEST_API_KEY)
                 .expect('Content-Type', /json/)
                 .expect(200);
 
@@ -123,7 +130,7 @@ describe('Server Integration Tests', () => {
             // Check cache stats
             const statsResponse = await request(app)
                 .get('/cache-stats')
-                .set('x-api-key', 'test-api-key-123')
+                .set('x-api-key', TEST_API_KEY)
                 .expect('Content-Type', /json/)
                 .expect(200);
 
@@ -145,7 +152,7 @@ describe('Server Integration Tests', () => {
             // Verify cache stats
             const statsResponse = await request(app)
                 .get('/cache-stats')
-                .set('x-api-key', 'test-api-key-123')
+                .set('x-api-key', TEST_API_KEY)
                 .expect('Content-Type', /json/)
                 .expect(200);
 
@@ -365,7 +372,7 @@ describe('Server Integration Tests', () => {
     });
 
     describe('Cache Operations', () => {
-        const validApiKey = 'test-api-key-123';
+        const validApiKey = TEST_API_KEY;
 
         it('should require valid API key for cache operations', async () => {
             // Test without API key

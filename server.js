@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const { open } = require('lmdb');
 const path = require('path');
@@ -145,7 +146,7 @@ const entriesValidation = [
 ];
 
 // API key configuration
-const API_KEY = process.env.API_KEY || 'test-api-key-123';
+const API_KEY = process.env.API_KEY;
 
 // API key validation middleware
 const validateApiKey = (req, res, next) => {

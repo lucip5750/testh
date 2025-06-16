@@ -51,7 +51,7 @@ NODE_ENV=development
 
 ### Environment Variables
 - `PORT`: Server port (default: 3000)
-- `API_KEY`: API key for authentication (default: 'test-api-key-123')
+- `API_KEY`: API key for authentication
 - `ALLOWED_ORIGINS`: Comma-separated list of allowed CORS origins (default: ['http://localhost:3000'])
 - `NODE_ENV`: Environment mode (development/production)
 
@@ -202,10 +202,9 @@ Manually clears the cache.
 ## Security Features
 
 ### API Key Authentication
-- Required for all endpoints
+- Required for cache endpoints
 - Configured via environment variable
 - Validates through `x-api-key` header
-- Default key: 'test-api-key-123'
 
 ### CORS Protection
 - Configurable allowed origins

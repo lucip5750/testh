@@ -3,3 +3,4 @@ data/*.mdb
 .DS_Store
 package-lock.json
 data/.DS_Store
+.env
