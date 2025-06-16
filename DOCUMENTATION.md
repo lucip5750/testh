@@ -158,9 +158,6 @@ Retrieves entries from the database with pagination support.
 - `limit` (optional): Number of entries to return (1-100, default: 100)
 - `offset` (optional): Number of entries to skip (default: 0)
 
-**Headers Required:**
-- `x-api-key`: API key for authentication
-
 **Response:**
 ```json
 [
